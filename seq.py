@@ -14,6 +14,8 @@ parser.add_option("-p", "--port", dest="port", default=8888,
                 help="port to listen on or connect to")
 parser.add_option("-c", "--connect", dest="connect",
                 action="store_true", default=False, help="connect to remote host")
+parser.add_option("-H", "--host", dest="host",
+                default="127.0.0.1", help="remote host to connect to or bind on")
 parser.add_option("-s", "--send", dest="send",
                 action="store_true", default=False, help="send data")
 
@@ -22,17 +24,18 @@ parser.add_option("-s", "--send", dest="send",
 connect = options.connect
 send = options.send
 port = int(options.port)
+host = options.host
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
 
 conn = s
 
 if connect:
-    s.connect(('127.0.0.1', port))
+    s.connect((host, port))
     print 'connected'
 else:
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind(('127.0.0.1', port))
+    s.bind((host, port))
     s.listen(1)
     conn, addr = s.accept()
     print 'Connection from', addr
