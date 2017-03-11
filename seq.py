@@ -19,6 +19,13 @@ parser.add_option("-H", "--host", dest="host",
                 default="127.0.0.1", help="remote host to connect to or bind on")
 parser.add_option("-s", "--send", dest="send",
                 action="store_true", default=False, help="send data")
+parser.add_option("-S", "--size", dest="size",
+                default=1024, help="send size (number of buffer lengths) default 1024")
+parser.add_option("-b", "--bufsize", dest="bufsize",
+                default=1024, help="Buffer size in bytes (default 1024)")
+parser.add_option("-d", "--delay", dest="delay",
+                default=0, help="How many microseconds to sleep between each send buffer")
+
 
 (options, args) = parser.parse_args()
 
@@ -60,8 +67,9 @@ def occasional_print(n, send=False):
         last_time = now
 
 
-BUF_SIZE = 1024
-SEND_SIZE = 1024*1024*20    # 20MB
+BUF_SIZE = int(options.bufsize)
+SEND_SIZE = int(options.size) * BUF_SIZE
+delay = float(options.delay)/1000000
 
 
 def send_thread(conn, delay):
@@ -84,7 +92,7 @@ def send_thread(conn, delay):
 
 thread = None
 if send:
-    thread = Thread(target=send_thread, args = (conn, 0))
+    thread = Thread(target=send_thread, args = (conn, delay))
     thread.start()
     #thread.join()
 
